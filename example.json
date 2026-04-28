@@ -1,0 +1,33 @@
+{
+    "Hello": "There",
+    "Shopping" : [
+        "Tomato",
+        "Potato",
+        "Carrots",
+        {
+            "name": "Batteries",
+            "reason": "I am out of batteries"
+        }
+    ],
+    "Documents": {
+        "Health": {
+            "name": "Health Document",
+            "id": 123,
+            "date": "12-2-2026"
+        },
+        "House": {
+            "name": "House Document",
+            "id": 234,
+            "date": "02-5-2016"
+        }
+    },
+    "This": {
+        "Path": {
+            "Is": {
+                "So": {
+                    "Nested": "Yes it is"
+                }
+            }
+        }
+    }
+}
