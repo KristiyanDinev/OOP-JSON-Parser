@@ -1,5 +1,39 @@
 #include <sstream>
 
+std::string extractNextArgument(const std::string& input, unsigned int& position) {
+    while (position < input.length() && input[position] == ' ') {
+        position++;
+    }
+
+    if (position >= input.length()) {
+        return "";
+    }
+
+    std::string result;
+
+    if (input[position] == '"') {
+        position++;
+        while (position < input.length() && input[position] != '"') {
+            result += input[position];
+            position++;
+        }
+
+        if (position < input.length()) {
+            position++;
+        }
+
+        return result;
+    }
+
+    while (position < input.length() && input[position] != ' ') {
+        result += input[position];
+        position++;
+    }
+
+    return result;
+}
+
+
 /* Storing all of the commands for better
 classification and work with them.
 */
@@ -167,8 +201,8 @@ class Menu {
         }
 
         void parseArguments(const std::string& input, Command& cmd, unsigned int commandStopInd) {
-            std::stringstream ss(input.substr(0, commandStopInd));
-            std::string token;
+            std::stringstream ss(input.substr(commandStopInd));
+            std::string word;
 
             ss >> std::ws;
 
@@ -176,8 +210,8 @@ class Menu {
                 ss.ignore();
                 std::getline(ss, cmd.arg1, '"');
             } else {
-                ss >> token;
-                cmd.arg1 = token;
+                ss >> word;
+                cmd.arg1 = word;
             }
 
             ss >> std::ws;
@@ -186,8 +220,8 @@ class Menu {
                 ss.ignore();
                 std::getline(ss, cmd.arg2, '"');
             } else {
-                ss >> token;
-                cmd.arg2 = token;
+                ss >> word;
+                cmd.arg2 = word;
             }
         }
 };
