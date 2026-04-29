@@ -1,5 +1,6 @@
 {
     "Hello": "There",
+    "1": 2,
     "Shopping": [
         "Tomato",
         "Potato",
@@ -17,7 +18,7 @@
         },
         "House": {
             "name": "House Document",
-            "id": 234,
+            "id": 234e2,
             "date": "02-5-2016"
         }
     },
@@ -29,5 +30,6 @@
                 }
             }
         }
-    }
+    },
+    "": [1,2,3]
 }

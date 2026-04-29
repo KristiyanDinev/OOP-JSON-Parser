@@ -9,12 +9,12 @@
 
 int main() {
     FileManager* fileManager = new FileManager();
-    JsonManager* jsonManager = new JsonManager("");
-    Menu menu = Menu(*fileManager, *jsonManager);
+    JsonParser* jsonParser = new JsonParser();
+    Menu menu = Menu(*fileManager, *jsonParser);
     while (true) {
         menu.executeCommand(menu.getCommand());
     }
     delete fileManager;
-    delete jsonManager;
+    delete jsonParser;
     return 0;
 }

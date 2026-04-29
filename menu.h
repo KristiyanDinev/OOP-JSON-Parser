@@ -37,8 +37,8 @@ implimenting the menu feature.
 */
 class Menu {
     public:
-        Menu(FileManager& fileManager, JsonManager& jsonManager) :
-         fileManager(fileManager), jsonManager(jsonManager) {}
+        Menu(FileManager& fileManager, JsonParser& jsonParser) :
+         fileManager(fileManager), jsonParser(jsonParser) {}
 
         void printHelp() {
             std::cout << "\n--------\n File Commands"
@@ -84,7 +84,6 @@ class Menu {
 
             parseArguments(input, cmd, commandStopInd);
 
-            std::cout << cmd.commandEnum << " " << cmd.arg1 << " " << cmd.arg2 << std::endl;
             return cmd;
         }
 
@@ -95,16 +94,16 @@ class Menu {
             switch (cmd.commandEnum) {
                 case CommandEnum::OPEN:
                     fileManager.openFile(cmd.arg1);
-                    jsonManager.setData(fileManager.readData());
+                    jsonParser.setJsonData(fileManager.readData());
                     break;
                 case CommandEnum::CLOSE:
                     fileManager.closeFile();
                     break;
                 case CommandEnum::SAVE:
-                    fileManager.saveData(jsonManager.prettyData());
+                    fileManager.saveData(jsonParser.getData(0));
                     break;
                 case CommandEnum::SAVEAS:
-                    fileManager.saveAs(cmd.arg1, jsonManager);
+                    fileManager.saveAs(cmd.arg1, jsonParser.getData(0));
                     break;
                 case CommandEnum::HELP:
                     printHelp();
@@ -113,20 +112,25 @@ class Menu {
                     exit(0);
                     break;
                 case CommandEnum::VALIDATE:
-                    jsonManager.validate(true);
+                    jsonParser.validate(true);
                     break;
                 case CommandEnum::PRINT:
-                    std::cout << jsonManager.prettyData() << std::endl;
+                    jsonParser.print();
                     break;
                 case CommandEnum::SEARCH:
+                    jsonParser.search(cmd.arg1);
                     break;
                 case CommandEnum::SET:
+                    jsonParser.setPathValue(cmd.arg1, cmd.arg2);
                     break;
                 case CommandEnum::CREATE:
+                    jsonParser.createValue(cmd.arg1, cmd.arg2);
                     break;
                 case CommandEnum::DELETE:
+                    jsonParser.deleteValue(cmd.arg1);
                     break;
                 case CommandEnum::MOVE:
+                    jsonParser.moveValue(cmd.arg1, cmd.arg2);
                     break;
 
                 default:
@@ -137,7 +141,7 @@ class Menu {
 
     private:
         FileManager& fileManager;
-        JsonManager& jsonManager;
+        JsonParser& jsonParser;
 
         std::string toLowerCase(char* input, int size) {
             for (int i = 0; i < size; i++) {
