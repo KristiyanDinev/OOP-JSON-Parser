@@ -8,13 +8,11 @@
 #include "menu.h"
 
 int main() {
-    FileManager* fileManager = new FileManager();
-    JsonParser* jsonParser = new JsonParser();
-    Menu menu = Menu(*fileManager, *jsonParser);
+    FileManager fileManager;
+    JsonParser jsonParser;
+    Menu menu = Menu(fileManager, jsonParser);
     while (true) {
-        menu.executeCommand(menu.getCommand());
+        menu.executeCommand(menu.getCommand(menu.getInput()));
     }
-    delete fileManager;
-    delete jsonParser;
     return 0;
 }

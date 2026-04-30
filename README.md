@@ -1,61 +1,222 @@
 # JSON Parser
 
-Това е конзолна апликация, която изпълнява четене, модификация и създаване на JSON файлове. Без да се използват излишни библиотеки.
+Console application for reading, validating, modifying, and saving JSON files without external JSON libraries.
 
+> What is JSON? https://www.w3schools.com/js/js_json.asp
 
-> [Какво е JSON?](https://www.w3schools.com/js/js_json.asp)
+## Purpose
 
-## Цел
+Provide a compact command-driven workflow for inspecting and editing JSON documents.
 
-Работенето с JSON файлове може да отнема време и нерви. Този проек има за цел да направи тази работа по-приятна и лесна за всеки програмист.
+## Build and Run
 
+This project is a console application. From the workspace root, compile the program with:
 
-## Термини
-
-- `Ключ` наричаме уникална стойност, чрез която можем да търсим не уникални стойности. Пример: `person`.
-
-- `Път` наричаме няколко ключа разделени с **/** . Пример: `person/name/lenght`. По конвенция е с `.`, но в тази програма работи чрез `/`. Ако работите със списък, тогава използвайте индекса на дадения елемент в пътя. Пример: `Students/3/name`.
-
-
->Бележка: При командите: set и create се приемат само примитивни типове данни.
-
-
-## Файлови Команди
-
-- `open [/path/to/file]` - Отваря дадения от потребителя файл в апликацията за обработка. Ако такъв файл не съществува, тогава програмата създава нов JSON файл с името **file.json** на това място за обработка и ще даде грешка, ако не може да го създаде.
-
-- `close` - Затваря отворения файл от апликацията без да го запазва.
-
-- `save` - Запазва отворения файл на диска и държи файла отворен.
-
-- `saveas` - Запазва отворения файл на като нов файл.
-
-- `help` - Показва помощното меню с всички команди и тяхната информация.
-
-- `exit` - Излиза от програмата. Ако има отворен файл, то той няма да се запази и цялата модифицирана информация се губи, ако има такава.
-
-## JSON Команди
-
-- `validate` - Дава обратна връзка на потребителя дали JSON файла е написан в правилен формат или има синтактична грешка.
-
-- `print` - Изпечатва цялата информация от JSON файла на по-разчетим начин.
-
-- `search <key>` - Извежда масив от всички стойности, които имат подадения ключ.
-
-- `set <path> <string>` - Обновяване на даден път с нова стойност. Ако този път не съществува, то ще има грешка.
-
-- `create <path> <string>` - Създава нов път с нова стойност. Ако пътя вече съществува, тогава ще има грешка.
-
-- `delete <path>` - Изтриване на път и съответно нейната стойност.
-
-- `move <from path> <to path>` - Елементите с път **from path** ще се преместят и ще имат нов път **to path**.
-
-## Примери
-
-```bash
-
+```text
+g++ -std=c++17 -g main.cpp -o json_parser.exe
 ```
 
-## TODO
+Then run it with:
 
-- Fix `move`
+```text
+.\json_parser.exe
+```
+
+If you prefer to build the test programs, compile each file in `tests/` separately using the same compiler flag style.
+
+## C++ Version
+
+The code is compatible with C++11 and later. C++17 is recommended for building and testing the project.
+
+## Terms
+
+- **Key**: A member name used to locate values, for example `Documents`.
+- **Path**: Slash-delimited keys or indices, for example `Documents/Health/name` or `Shopping/3/name`.
+
+Note: `set` and `create` accept primitive values only.
+
+## File Commands
+
+- `open [/path/to/file]` - Opens a JSON file for processing. If it does not exist, a new file named `file.json` is created in that location.
+- `close` - Closes the file without saving.
+- `save` - Saves changes to the currently opened file.
+- `saveas` - Saves changes to a new file path.
+- `help` - Prints the help menu.
+- `exit` - Exits the program without saving.
+
+## JSON Commands
+
+- `validate` - Reports whether the loaded JSON is valid.
+- `print` - Prints the JSON with indentation.
+- `search <key>` - Prints an array with all values that match the key.
+- `set <path> <string>` - Updates an existing path with a new value.
+- `create <path> <string>` - Creates a new path with a value.
+- `delete <path>` - Deletes a path and its value.
+- `move <from path> <to path>` - Moves a value from one path to another.
+
+## Examples (using example.json)
+
+Assume the working directory contains `example.json` with the provided sample content.
+
+### open
+
+```text
+open example.json
+```
+
+Expected result:
+```text
+The file is open/create: example.json
+```
+
+### help
+
+```text
+help
+```
+
+Expected result: the full command list is printed.
+
+### validate
+
+```text
+validate
+```
+
+Expected result:
+```text
+Valid JSON.
+```
+
+### print
+
+```text
+print
+```
+
+Expected result: formatted output of the JSON document.
+
+### search
+
+```text
+search name
+```
+
+Expected result (values with the key `name`):
+```text
+Search results for key 'name': [
+	"Health Document",
+	"House Document",
+	"Batteries"
+]
+```
+
+### set
+
+```text
+set Documents/Health/name "Updated Health Document"
+```
+
+Expected result:
+```text
+Set Documents/Health/name with the value "Updated Health Document"
+```
+
+### create
+
+```text
+create Documents/Health/owner "Alice"
+```
+
+Expected result:
+```text
+Created Documents/Health/owner with value "Alice"
+```
+
+### delete
+
+```text
+delete Shopping/0
+```
+
+Expected result:
+```text
+Deleted Shopping/0
+```
+
+### move
+
+```text
+move Hello Greeting
+```
+
+Expected result:
+```text
+Moved from Hello to Greeting
+```
+
+### save
+
+```text
+save
+```
+
+Expected result:
+```text
+The data has been written to the file.
+```
+
+### saveas
+
+```text
+saveas "example-copy.json"
+```
+
+Expected result:
+```text
+The data has been written to the file.
+```
+
+### close
+
+```text
+close
+```
+
+Expected result:
+```text
+The file is closed.
+```
+
+### exit
+
+```text
+exit
+```
+
+Expected result: the program terminates without saving.
+
+## Unit Tests
+
+Three standalone test files are included under `tests/` (no external libraries or JSON parsers used):
+
+- `tests/json_tests.cpp`: JsonParser parsing/validation, search, create/set/delete/move, and error handling.
+- `tests/file_tests.cpp`: FileManager open/close/save/saveas/read, including fallback behavior when a path cannot be opened.
+- `tests/menu_tests.cpp`: Menu command parsing and command execution for open/save/close.
+
+### Running the tests (g++)
+
+From the workspace root:
+
+```text
+g++ -std=c++17 -g tests/json_tests.cpp -o tests/json_tests.exe
+tests\\json_tests.exe
+
+g++ -std=c++17 -g tests/file_tests.cpp -o tests/file_tests.exe
+tests\\file_tests.exe
+
+g++ -std=c++17 -g tests/menu_tests.cpp -o tests/menu_tests.exe
+tests\\menu_tests.exe
+```
+
+Note: The tests create temporary JSON files in the working directory and clean them up.

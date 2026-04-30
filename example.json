@@ -1,6 +1,23 @@
 {
-    "Hello": "There",
+    "": [
+        1,
+        2,
+        3
+    ],
     "1": 2,
+    "Documents": {
+        "Health": {
+            "date": "12-2-2026",
+            "id": 123,
+            "name": "Health Document"
+        },
+        "House": {
+            "date": "02-5-2016",
+            "id": 234e2,
+            "name": "House Document"
+        }
+    },
+    "Hello": "There",
     "Shopping": [
         "Tomato",
         "Potato",
@@ -10,18 +27,6 @@
             "reason": "I am out of batteries"
         }
     ],
-    "Documents": {
-        "Health": {
-            "name": "Health Document",
-            "id": 123,
-            "date": "12-2-2026"
-        },
-        "House": {
-            "name": "House Document",
-            "id": 234e2,
-            "date": "02-5-2016"
-        }
-    },
     "This": {
         "Path": {
             "Is": {
@@ -30,6 +35,5 @@
                 }
             }
         }
-    },
-    "": [1,2,3]
+    }
 }

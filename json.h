@@ -2,15 +2,20 @@
 #include <map>
 #include <stack>
 
-// Abstract class
+// Abstract base node for all JSON elements.
 class JsonNode {
 public:
+    // Virtual destructor for safe polymorphic cleanup.
     virtual ~JsonNode() = default;
+    // Prints the node to stdout with indentation.
     virtual void print(unsigned int indent = 0) const = 0;
+    // Emits indentation for pretty printing.
     void printIndent(unsigned int indent) const {
         for (int i = 0; i < indent; i++) std::cout << "  ";
     }
+    // Serializes the node to a formatted string.
     virtual std::string getData(unsigned int indent = 0) const = 0;
+    // Builds an indentation string for serialization.
     std::string getIndent(unsigned int indent) const {
         std::string data;
         for (int i = 0; i < indent; i++) {
@@ -20,35 +25,42 @@ public:
     }
 };
 
+// Represents primitive JSON values such as strings, numbers, and literals.
 class JsonPrimitive : public JsonNode {
 private:
     std::string value;
     friend class JsonParser;
 
 public:
+    // Stores the raw value text.
     JsonPrimitive(const std::string& val) : value(val) {}
 
+    // Prints the primitive value.
     void print(unsigned int indent = 0) const {
         std::cout << value;
     }
 
+    // Returns the serialized primitive value.
     std::string getData(unsigned int indent = 0) const {
         return value;
     }
 };
 
+// Represents a JSON object (key-value mapping).
 class JsonObject : public JsonNode {
 private:
     std::map<std::string, JsonNode*> members;
     friend class JsonParser;
 
 public:
+    // Deletes all member nodes.
     ~JsonObject() {
         for (auto const& pair : members) {
             delete pair.second;
         }
     }
 
+    // Prints the object with pretty formatting.
     void print(unsigned int indent = 0) const {
         unsigned int nextIndent = indent + 1;
         std::cout << "{\n";
@@ -65,6 +77,7 @@ public:
         std::cout << "}";
     }
 
+    // Returns a formatted JSON object string.
     std::string getData(unsigned int indent = 0) const {
         std::string data;
         unsigned int nextIndent = indent + 1;
@@ -81,18 +94,21 @@ public:
     }
 };
 
+// Represents a JSON array (ordered list).
 class JsonArray : public JsonNode {
 private:
     std::vector<JsonNode*> elements;
     friend class JsonParser;
 
 public:
+    // Deletes all element nodes.
     ~JsonArray() {
         for (JsonNode* node : elements) {
             delete node;
         }
     }
 
+    // Prints the array with pretty formatting.
     void print(unsigned int indent = 0) const {
         unsigned int nextIndent = indent + 1;
         std::cout << "[\n";
@@ -108,6 +124,7 @@ public:
         std::cout << "]";
     }
 
+    // Returns a formatted JSON array string.
     std::string getData(unsigned int indent = 0) const {
         std::string data;
         unsigned int nextIndent = indent + 1;
@@ -124,17 +141,21 @@ public:
 };
 
 
+// Parses, validates, and mutates JSON data in memory.
 class JsonParser {
 public:
+    // Releases the parsed tree.
     ~JsonParser() {
         delete root;
     }
 
+    // Sets raw JSON text and performs a silent validation.
     void setJsonData(const std::string& jsonData) {
         this->jsonData = jsonData;
         validate(false);
     }
 
+    // Validates JSON text and optionally prints messages.
     bool validate(bool showMessages) {
         delete root;
         std::stringstream ss(jsonData);
@@ -154,6 +175,7 @@ public:
         }
     }
 
+    // Prints the parsed JSON tree or an error message.
     void print() {
         if (root) {
             root->print();
@@ -163,6 +185,7 @@ public:
         }
     }
 
+    // Searches for values by key and prints all matches.
     void search(const std::string& key) {
         std::vector<JsonNode*> results;
         searchRecursive(root, key, results);
@@ -170,14 +193,15 @@ public:
         std::cout << "Search results for key '" << key << "': [\n";
         bool first = true;
         for (size_t i = 0; i < results.size(); ++i) {
-            if (!first) std::cout << ",";
             results[i]->print(1);
+            if (!first) std::cout << ",";
             std::cout << "\n";
             first = false;
         }
         std::cout << "]\n";
     }
 
+    // Replaces a value at an existing path.
     void setPathValue(const std::string& path, std::string& value) {
         std::vector<std::string> parts = splitPath(path);
         if (parts.empty()) return;
@@ -192,6 +216,7 @@ public:
         if (obj && obj->members.find(finalKey) != obj->members.end()) {
             delete obj->members[finalKey];
             obj->members[finalKey] = new JsonPrimitive(value);
+            std::cout << "Set " << path << " with the value " << value << std::endl;
             return;
             
         } else if (arr) {
@@ -199,12 +224,14 @@ public:
             if (index < arr->elements.size()) {
                 delete arr->elements[index];
                 arr->elements[index] = new JsonPrimitive(value);
+                std::cout << "Set " << path << " with the value " << value << std::endl;
                 return;
             }
         }
         std::cout << "Invalid Path: '" << path << "' does not exist.\n";
     }
 
+    // Creates a new value at a path, expanding objects as needed.
     void createValue(const std::string& path, std::string& value) {
         std::vector<std::string> parts = splitPath(path);
         if (parts.empty()) return;
@@ -241,6 +268,7 @@ public:
         if (obj) {
             if (obj->members.find(finalKey) == obj->members.end()) {
                 obj->members[finalKey] = new JsonPrimitive(value);
+                std::cout << "Created " << path << " with value " << value << std::endl;
                 return;
             }
             std::cout << "Invalid Path: Path '" << path << "' already exists.\n";
@@ -248,12 +276,14 @@ public:
 
         } else if (arr) {
             arr->elements.push_back(new JsonPrimitive(value));
+            std::cout << "Added " << value << " to " << path << std::endl;
             return;
         }
 
         std::cout << "Invalid Path: Path '" << path << "' does not exist.\n";
     }
 
+    // Deletes a value at the given path.
     void deleteValue(const std::string& path) {
         std::vector<std::string> parts = splitPath(path);
         if (parts.empty()) return;
@@ -269,6 +299,7 @@ public:
             if (itEle != obj->members.end()) {
                 delete itEle->second;
                 obj->members.erase(itEle);
+                std::cout << "Deleted " << path << std::endl;
                 return;
             }
         } else if (arr) {
@@ -276,12 +307,14 @@ public:
             if (index < arr->elements.size()) {
                 delete arr->elements[index];
                 arr->elements.erase(arr->elements.begin() + index);
+                std::cout << "Deleted " << path << std::endl;
                 return;
             }
         }
         std::cout << "Error: Path '" << path << "' does not exist.\n";
     }
 
+    // Moves a value from one path to another.
     void moveValue(const std::string& fromPath, const std::string& toPath) {
         std::vector<std::string> fromParts = splitPath(fromPath);
         if (fromParts.empty()) return;
@@ -307,6 +340,7 @@ public:
         JsonObject* toObj = dynamic_cast<JsonObject*>(toParent);
         if (toObj && toObj->members.find(toKey) == toObj->members.end()) {
             toObj->members[toKey] = targetNode;
+            std::cout << "Moved from " << fromPath << " to " << toPath << std::endl;
             return;
         }
         
@@ -314,6 +348,7 @@ public:
         std::cout << "Invalid Path: Destination path is invalid or already occupied.\n";
     }
 
+    // Serializes the current JSON tree with indentation.
     std::string getData(unsigned int indent) const {
         if (root) {
             return root->getData(indent);
@@ -327,6 +362,7 @@ private:
     JsonNode* root = nullptr;
     std::string jsonData;
 
+    // Normalizes value as a JSON literal or quoted string.
     void formatValue(std::string& value) const {
         bool isNum = false;
         try {
@@ -340,16 +376,19 @@ private:
         }
     }
 
+    // Prints a message only when user feedback is enabled.
     void printMessage(bool showMessages, const char* message) {
         if (showMessages) {
             std::cout << message << std::endl;
         }
     }
 
+    // Consumes whitespace in the stream.
     void skipWhitespace(std::stringstream& ss) {
         ss >> std::ws;
     }
 
+    // Parses the next JSON value based on leading token.
     JsonNode* parseValue(std::stringstream& ss) {
         skipWhitespace(ss);
         char c = ss.peek();
@@ -360,6 +399,7 @@ private:
         return parseOther(ss);
     }
 
+    // Parses a JSON object into a node tree.
     JsonNode* parseObject(std::stringstream& ss) {
         JsonObject* obj = new JsonObject();
         ss.ignore();
@@ -387,6 +427,7 @@ private:
         return obj;
     }
 
+    // Parses a JSON array into a node tree.
     JsonNode* parseArray(std::stringstream& ss) {
         JsonArray* arr = new JsonArray();
         ss.ignore();
@@ -407,6 +448,7 @@ private:
         return arr;
     }
 
+    // Parses a quoted JSON string without the quotes.
     std::string parseString(std::stringstream& ss) {
         std::string out;
         if (ss.get() != '"') throw std::runtime_error("Expected string starting with '\"'.");
@@ -414,10 +456,12 @@ private:
         return out;
     }
 
+    // Builds a primitive node from a parsed string.
     JsonNode* formatString(std::stringstream& ss) {
         return new JsonPrimitive("\"" + parseString(ss) + "\"");
     }
 
+    // Parses numbers and literal values (true/false/null).
     JsonNode* parseOther(std::stringstream& ss) {
         std::string val;
         char c = ss.peek();
@@ -442,6 +486,7 @@ private:
 
     }
 
+    // Splits a slash-delimited path into parts.
     std::vector<std::string> splitPath(const std::string& path) {
         std::vector<std::string> parts;
         std::stringstream ss(path);
@@ -452,7 +497,7 @@ private:
         return parts;
     }
 
-    // Get JsonNode from Path vector.
+    // Walks the tree to find the parent of a target path.
     JsonNode* findParentNode(JsonNode* current, const std::vector<std::string>& path, size_t index) {
         if (!current || index == path.size() - 1) {
             return current;
@@ -471,7 +516,7 @@ private:
         return nullptr;
     }
 
-    // Get all values with a specific key
+    // Collects all values that match a specific key.
     void searchRecursive(JsonNode* current, const std::string& searchKey, std::vector<JsonNode*>& results) {
         if (!current) return;
 
@@ -487,9 +532,6 @@ private:
             }
         } else if (arr) {
             for (JsonNode* node : arr->elements) {
-                if (dynamic_cast<JsonPrimitive*>(node)) {
-                    results.push_back(node);
-                }
                 searchRecursive(node, searchKey, results);
             }
         }

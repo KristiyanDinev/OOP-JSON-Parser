@@ -1,7 +1,5 @@
 
-/* Storing all of the commands for better
-classification and work with them.
-*/
+// Enumerates supported console commands.
 enum CommandEnum {
     OPEN,
     CLOSE,
@@ -18,13 +16,7 @@ enum CommandEnum {
     MOVE
 };
 
-/* The struck Command, which will be used to
-pass the whole command into functions and since
-the maximum number of arguments for a single command
-is 2. We have arg1 and arg2. We use struct instead of
-classes, because struck has all we need and classes
-only have more functionality and features we don't need.
-*/
+// Holds a parsed command and up to two arguments.
 struct Command
 {
     std::string arg1;
@@ -32,14 +24,14 @@ struct Command
     CommandEnum commandEnum;
 };
 
-/* This is our Menu class, which will be used for
-implimenting the menu feature.
-*/
+// Coordinates user input parsing and command execution.
 class Menu {
     public:
+        // Binds to the active file manager and JSON parser.
         Menu(FileManager& fileManager, JsonParser& jsonParser) :
          fileManager(fileManager), jsonParser(jsonParser) {}
 
+        // Prints a full command reference to the console.
         void printHelp() {
             std::cout << "\n--------\n File Commands"
             << "\n\nopen [/path/to/file] - Opens the file selected by the user in the application for processing. If the file does not exist, the program creates a new JSON file named file.json at that location for processing, and it will report an error if it cannot create it."
@@ -58,15 +50,17 @@ class Menu {
             << "\n\nmove <from path> <to path> - Elements at the from path will be moved and assigned the new to path.\n--------\n";
         }
 
-        Command getCommand() {
+        // Reads a line and returns the parsed command.
+        std::string getInput() {
             std::string input;
             std::getline(std::cin, input);
+            return input;
+        }
+
+        Command getCommand(const std::string& input) {
             Command cmd;
 
-            /*
-            For a more optimized implementation, we need to know where the
-            command ends and where the arguments start, so we do not parse the same thing twice.
-            */ 
+            // Locate the command boundary to avoid reparsing arguments.
             unsigned int commandStopInd = 0;
             while (commandStopInd < input.length() && input[commandStopInd] != ' ') {
                 commandStopInd++;
@@ -87,9 +81,7 @@ class Menu {
             return cmd;
         }
 
-        /* This code menu.executeCommand(menu.getCommand()); is executed
-        in the main function.
-        */
+        // Executes the command and dispatches to the correct handler.
         void executeCommand(Command cmd) {
             switch (cmd.commandEnum) {
                 case CommandEnum::OPEN:
@@ -143,6 +135,7 @@ class Menu {
         FileManager& fileManager;
         JsonParser& jsonParser;
 
+        // Normalizes the command name for matching.
         std::string toLowerCase(char* input, int size) {
             for (int i = 0; i < size; i++) {
                 input[i] = std::tolower(input[i]);
@@ -150,6 +143,7 @@ class Menu {
             return std::string(input, size);
         }
 
+        // Maps the command text to its enum value.
         void getCommandEnumFromInput(const std::string& input, Command& cmd, unsigned int commandStopInd) {
             std::string commandName;
             if (commandStopInd == 0) {
@@ -176,6 +170,7 @@ class Menu {
             else cmd.commandEnum = CommandEnum::HELP;
         }
 
+        // Parses up to two arguments, supporting quoted strings.
         void parseArguments(const std::string& input, Command& cmd, unsigned int commandStopInd) {
             std::stringstream ss(input.substr(commandStopInd));
             std::string word;
