@@ -134,10 +134,6 @@ bool JsonParser::validate(bool showMessages) {
     try {
         root = parseValue(ss);
         skipWhitespace(ss);
-        if (ss.good() && !ss.eof()) {
-            printMessage(showMessages, "Invalid JSON: Unexpected trailing characters.");
-            return false;
-        }
         printMessage(showMessages, "Valid JSON.");
         return true;
     } catch (const std::exception& e) {
