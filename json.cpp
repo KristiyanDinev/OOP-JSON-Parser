@@ -7,18 +7,16 @@
 
 #include "json.hpp"
 
-// Abstract base node for all JSON elements.
-// Virtual destructor for safe polymorphic cleanup.
+// Virtual destructor for JsonNode
 JsonNode::~JsonNode() = default;
 
-// Prints the node to stdout with indentation.
-// Emits indentation for pretty printing.
+
+// Default function to print the indent for every class
 void JsonNode::printIndent(unsigned int indent) const {
     for (int i = 0; i < indent; i++) std::cout << "  ";
 }
 
-// Serializes the node to a formatted string.
-// Builds an indentation string for serialization.
+// Get indent as string
 std::string JsonNode::getIndent(unsigned int indent) const {
     std::string data;
     for (int i = 0; i < indent; i++) {
@@ -27,29 +25,27 @@ std::string JsonNode::getIndent(unsigned int indent) const {
     return data;
 }
 
-// Represents primitive JSON values such as strings, numbers, and literals.
-// Stores the raw value text.
+// Constructor for JsonPrimitive, which keeps the raw values
 JsonPrimitive::JsonPrimitive(const std::string& val) : value(val) {}
 
-// Prints the primitive value.
+// Print that value
 void JsonPrimitive::print(unsigned int indent) const {
     std::cout << value;
 }
 
-// Returns the serialized primitive value.
+// Get that value
 std::string JsonPrimitive::getData(unsigned int indent) const {
     return value;
 }
 
-// Represents a JSON object (key-value mapping).
-// Deletes all member nodes.
+// Virtual destructor for JsonObject
 JsonObject::~JsonObject() {
     for (auto const& pair : members) {
         delete pair.second;
     }
 }
 
-// Prints the object with pretty formatting.
+// Pretty print JsonObject
 void JsonObject::print(unsigned int indent) const {
     unsigned int nextIndent = indent + 1;
     std::cout << "{\n";
@@ -66,7 +62,7 @@ void JsonObject::print(unsigned int indent) const {
     std::cout << "}";
 }
 
-// Returns a formatted JSON object string.
+// Get pretty print as string
 std::string JsonObject::getData(unsigned int indent) const {
     std::string data;
     unsigned int nextIndent = indent + 1;
@@ -82,15 +78,14 @@ std::string JsonObject::getData(unsigned int indent) const {
     return data;
 }
 
-// Represents a JSON array (ordered list).
-// Deletes all element nodes.
+// Virtual destructor JsonArray
 JsonArray::~JsonArray() {
     for (JsonNode* node : elements) {
         delete node;
     }
 }
 
-// Prints the array with pretty formatting.
+// Pretty print JsonArray
 void JsonArray::print(unsigned int indent) const {
     unsigned int nextIndent = indent + 1;
     std::cout << "[\n";
@@ -106,7 +101,7 @@ void JsonArray::print(unsigned int indent) const {
     std::cout << "]";
 }
 
-// Returns a formatted JSON array string.
+// Get pretty print as string
 std::string JsonArray::getData(unsigned int indent) const {
     std::string data;
     unsigned int nextIndent = indent + 1;
@@ -121,19 +116,18 @@ std::string JsonArray::getData(unsigned int indent) const {
     return data;
 }
 
-// Parses, validates, and mutates JSON data in memory.
-// Releases the parsed tree.
+// Virtual destructor for JsonParser, which deletes the root object from RAM
 JsonParser::~JsonParser() {
     delete root;
 }
 
-// Sets raw JSON text and performs a silent validation.
+// Set the JSON string to be parsed
 void JsonParser::setJsonData(const std::string& jsonData) {
     this->jsonData = jsonData;
     validate(false);
 }
 
-// Validates JSON text and optionally prints messages.
+// Validates JSON text with optional bool flag showMessages for feedback
 bool JsonParser::validate(bool showMessages) {
     delete root;
     std::stringstream ss(jsonData);
@@ -153,7 +147,7 @@ bool JsonParser::validate(bool showMessages) {
     }
 }
 
-// Prints the parsed JSON tree or an error message.
+// Print the root object
 void JsonParser::print() {
     if (root) {
         root->print();
@@ -163,7 +157,7 @@ void JsonParser::print() {
     }
 }
 
-// Searches for values by key and prints all matches.
+// Search all values with that key. Paths can differ.
 void JsonParser::search(const std::string& key) {
     std::vector<JsonNode*> results;
     searchRecursive(root, key, results);
@@ -179,7 +173,7 @@ void JsonParser::search(const std::string& key) {
     std::cout << "]\n";
 }
 
-// Replaces a value at an existing path.
+// Replaces an already existing value on that path with our new value
 void JsonParser::setPathValue(const std::string& path, std::string& value) {
     std::vector<std::string> parts = splitPath(path);
     if (parts.empty()) return;
@@ -209,7 +203,7 @@ void JsonParser::setPathValue(const std::string& path, std::string& value) {
     std::cout << "Invalid Path: '" << path << "' does not exist.\n";
 }
 
-// Creates a new value at a path, expanding objects as needed.
+// Creates a new value with the given path
 void JsonParser::createValue(const std::string& path, std::string& value) {
     std::vector<std::string> parts = splitPath(path);
     if (parts.empty()) return;
@@ -261,7 +255,7 @@ void JsonParser::createValue(const std::string& path, std::string& value) {
     std::cout << "Invalid Path: Path '" << path << "' does not exist.\n";
 }
 
-// Deletes a value at the given path.
+// Deletes the value at the given path
 void JsonParser::deleteValue(const std::string& path) {
     std::vector<std::string> parts = splitPath(path);
     if (parts.empty()) return;
@@ -292,7 +286,7 @@ void JsonParser::deleteValue(const std::string& path) {
     std::cout << "Error: Path '" << path << "' does not exist.\n";
 }
 
-// Moves a value from one path to another.
+// Moves a value from one path to another
 void JsonParser::moveValue(const std::string& fromPath, const std::string& toPath) {
     std::vector<std::string> fromParts = splitPath(fromPath);
     if (fromParts.empty()) return;
@@ -326,7 +320,7 @@ void JsonParser::moveValue(const std::string& fromPath, const std::string& toPat
     std::cout << "Invalid Path: Destination path is invalid or already occupied.\n";
 }
 
-// Serializes the current JSON tree with indentation.
+// Get the root pretty print as string 
 std::string JsonParser::getData(unsigned int indent) const {
     if (root) {
         return root->getData(indent);
@@ -336,7 +330,7 @@ std::string JsonParser::getData(unsigned int indent) const {
     }
 }
 
-// Normalizes value as a JSON literal or quoted string.
+// Gets ready value for JsonPrimitive
 void JsonParser::formatValue(std::string& value) const {
     bool isNum = false;
     try {
@@ -350,19 +344,19 @@ void JsonParser::formatValue(std::string& value) const {
     }
 }
 
-// Prints a message only when user feedback is enabled.
+// Print a message only when showMessages is true
 void JsonParser::printMessage(bool showMessages, const char* message) {
     if (showMessages) {
         std::cout << message << std::endl;
     }
 }
 
-// Consumes whitespace in the stream.
+// Skip white spaces
 void JsonParser::skipWhitespace(std::stringstream& ss) {
     ss >> std::ws;
 }
 
-// Parses the next JSON value based on leading token.
+// Parses a JSON value
 JsonNode* JsonParser::parseValue(std::stringstream& ss) {
     skipWhitespace(ss);
     char c = ss.peek();
@@ -373,7 +367,7 @@ JsonNode* JsonParser::parseValue(std::stringstream& ss) {
     return parseOther(ss);
 }
 
-// Parses a JSON object into a node tree.
+// Parses a JSON object
 JsonNode* JsonParser::parseObject(std::stringstream& ss) {
     JsonObject* obj = new JsonObject();
     ss.ignore();
@@ -401,7 +395,7 @@ JsonNode* JsonParser::parseObject(std::stringstream& ss) {
     return obj;
 }
 
-// Parses a JSON array into a node tree.
+// Parses a JSON array
 JsonNode* JsonParser::parseArray(std::stringstream& ss) {
     JsonArray* arr = new JsonArray();
     ss.ignore();
@@ -422,7 +416,7 @@ JsonNode* JsonParser::parseArray(std::stringstream& ss) {
     return arr;
 }
 
-// Parses a quoted JSON string without the quotes.
+// Parses a JSON string
 std::string JsonParser::parseString(std::stringstream& ss) {
     std::string out;
     if (ss.get() != '"') throw std::exception();
@@ -430,18 +424,18 @@ std::string JsonParser::parseString(std::stringstream& ss) {
     return out;
 }
 
-// Builds a primitive node from a parsed string.
+// Get JsonPrimitive for a string
 JsonNode* JsonParser::formatString(std::stringstream& ss) {
     return new JsonPrimitive("\"" + parseString(ss) + "\"");
 }
 
-// Parses numbers and literal values (true/false/null).
+// Parses other than string values
 JsonNode* JsonParser::parseOther(std::stringstream& ss) {
     std::string val;
     char c = ss.peek();
     while (ss.good() && !std::isspace(c) && c != ',' && 
            c != '}' && c != ']') {
-        val += static_cast<char>(ss.get());
+        val += ss.get();
         c = ss.peek();
     }
 
@@ -460,7 +454,7 @@ JsonNode* JsonParser::parseOther(std::stringstream& ss) {
 
 }
 
-// Splits a slash-delimited path into parts.
+// Splits the given path into a vector of keys
 std::vector<std::string> JsonParser::splitPath(const std::string& path) {
     std::vector<std::string> parts;
     std::stringstream ss(path);
@@ -471,7 +465,7 @@ std::vector<std::string> JsonParser::splitPath(const std::string& path) {
     return parts;
 }
 
-// Walks the tree to find the parent of a target path.
+// Get the parent Object of a key
 JsonNode* JsonParser::findParentNode(JsonNode* current, const std::vector<std::string>& path, std::size_t index) {
     if (!current || index == path.size() - 1) {
         return current;
@@ -490,7 +484,7 @@ JsonNode* JsonParser::findParentNode(JsonNode* current, const std::vector<std::s
     return nullptr;
 }
 
-// Collects all values that match a specific key.
+// Get all values, which have a specific key
 void JsonParser::searchRecursive(JsonNode* current, const std::string& searchKey, std::vector<JsonNode*>& results) {
     if (!current) return;
 

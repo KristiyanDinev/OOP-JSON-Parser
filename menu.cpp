@@ -8,14 +8,11 @@
 #include "json.hpp"
 #include "menu.hpp"
 
-// Enumerates supported console commands.
-// Holds a parsed command and up to two arguments.
-// Coordinates user input parsing and command execution.
-// Binds to the active file manager and JSON parser.
+// Construct the Menu with the classes, which we need to execute the commands
 Menu::Menu(FileManager& fileManager, JsonParser& jsonParser) :
          fileManager(fileManager), jsonParser(jsonParser) {}
 
-// Prints a full command reference to the console.
+// the Help menu
 void Menu::printHelp() {
     std::cout << "\n--------\n File Commands"
     << "\n\nopen [/path/to/file] - Opens the file selected by the user in the application for processing. If the file does not exist, the program creates a new JSON file named file.json at that location for processing, and it will report an error if it cannot create it."
@@ -34,17 +31,18 @@ void Menu::printHelp() {
     << "\n\nmove <from path> <to path> - Elements at the from path will be moved and assigned the new to path.\n--------\n";
 }
 
-// Reads a line and returns the parsed command.
+// Get console input (Usefull when seperated, so we can use getCommand() independently)
 std::string Menu::getInput() {
     std::string input;
     std::getline(std::cin, input);
     return input;
 }
 
+
+// Builds the Command struct from the given input
 Command Menu::getCommand(const std::string& input) {
     Command cmd;
 
-    // Locate the command boundary to avoid reparsing arguments.
     unsigned int commandStopInd = 0;
     while (commandStopInd < input.length() && input[commandStopInd] != ' ') {
         commandStopInd++;
@@ -65,7 +63,7 @@ Command Menu::getCommand(const std::string& input) {
     return cmd;
 }
 
-// Executes the command and dispatches to the correct handler.
+// Executes the command
 void Menu::executeCommand(Command cmd) {
     switch (cmd.commandEnum) {
         case CommandEnum::OPEN:
@@ -115,7 +113,7 @@ void Menu::executeCommand(Command cmd) {
     }
 }
 
-// Normalizes the command name for matching.
+// Convert string to lower case, because we need case-insentitive commands
 std::string Menu::toLowerCase(char* input, int size) {
     for (int i = 0; i < size; i++) {
         input[i] = std::tolower(input[i]);
@@ -123,7 +121,7 @@ std::string Menu::toLowerCase(char* input, int size) {
     return std::string(input, size);
 }
 
-// Maps the command text to its enum value.
+// Get the enum, which the command is trying to use
 void Menu::getCommandEnumFromInput(const std::string& input, Command& cmd, unsigned int commandStopInd) {
     std::string commandName;
     if (commandStopInd == 0) {
@@ -150,7 +148,7 @@ void Menu::getCommandEnumFromInput(const std::string& input, Command& cmd, unsig
     else cmd.commandEnum = CommandEnum::HELP;
 }
 
-// Parses up to two arguments, supporting quoted strings.
+// Get the two arguments from the input
 void Menu::parseArguments(const std::string& input, Command& cmd, unsigned int commandStopInd) {
     std::stringstream ss(input.substr(commandStopInd));
     std::string word;

@@ -6,10 +6,6 @@
 #include "file.hpp"
 #include "json.hpp"
 
-#pragma once
-
-#include <string>
-
 class FileManager;
 class JsonParser;
 

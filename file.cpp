@@ -6,8 +6,7 @@
 
 #include "file.hpp"
 
-// Manages file lifecycle and persistence for JSON data.
-// Opens a file for read/write; falls back to default on failure.
+// Creates (if does not exists) and opens a file stream, which will be used while editing the JSON
 bool FileManager::openFile(std::string& filename) {
     file.clear();
     createFile(filename);
@@ -29,12 +28,12 @@ bool FileManager::openFile(std::string& filename) {
     return true;
 }
 
-// Ensures a file exists by opening it in append mode.
+// Create that file by opening it with the append IO flag
 void FileManager::createFile(const std::string& name) const {
     std::fstream created(name, std::ios::app);
 }
 
-// Closes the current file and resets its state.
+// Closes the current file and clear the file flags
 void FileManager::closeFile() {
     if (file.is_open()) {
         file.close();
@@ -43,7 +42,8 @@ void FileManager::closeFile() {
     file.clear();
 }
 
-// Truncates and writes the provided JSON data to the current file.
+// Close and open the file as a new file (no context from original file) and save the given
+// data inside the file
 void FileManager::saveData(const std::string& data) {
     if (file.is_open()) {
         file.close();
@@ -61,7 +61,7 @@ void FileManager::saveData(const std::string& data) {
     }
 }
 
-// Reads the entire file content into a string.
+// Get the entire file content
 std::string FileManager::readData() {
     if (!file.is_open()) {
         return "";
@@ -77,7 +77,7 @@ std::string FileManager::readData() {
     return data;
 }
 
-// Saves data to a new file path and keeps it open.
+// Saves data to a new file and keep the new file open
 void FileManager::saveAs(std::string& newFilename, const std::string& data) {
     if (file.is_open()) {
         file.close();
@@ -87,7 +87,3 @@ void FileManager::saveAs(std::string& newFilename, const std::string& data) {
     }
     saveData(data);
 }
-
-// Stream for the currently opened file.
-// Default file name used when opening fails.
-// Tracks the active file path for save operations.
