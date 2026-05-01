@@ -82,7 +82,7 @@ void writeTextFile(const std::string& path, const std::string& data) {
 std::string readTextFile(const std::string& path) {
     std::ifstream file(path.c_str());
     file.seekg(0, std::ios::end);
-    size_t size = file.tellg();
+    std::size_t size = file.tellg();
     std::string data;
     data.resize(size);
 

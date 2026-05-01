@@ -3,9 +3,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "json.h"
-#include "file.h"
-#include "menu.h"
+#include "json.cpp"
+#include "file.cpp"
+#include "menu.cpp"
 
 int main() {
     FileManager fileManager;
