@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <string>
@@ -6,31 +5,8 @@
 #include "file.hpp"
 #include "json.hpp"
 
-class FileManager;
-class JsonParser;
-
-enum CommandEnum {
-    OPEN,
-    CLOSE,
-    SAVE,
-    SAVEAS,
-    HELP,
-    EXIT,
-    VALIDATE,
-    PRINT,
-    SEARCH,
-    SET,
-    CREATE,
-    DELETE,
-    MOVE
-};
-
-struct Command
-{
-    std::string arg1;
-    std::string arg2;
-    CommandEnum commandEnum;
-};
+enum CommandEnum;
+struct Command;
 
 class Menu {
     public:
@@ -44,7 +20,6 @@ class Menu {
     private:
         FileManager& fileManager;
         JsonParser& jsonParser;
-
         std::string toLowerCase(char* input, int size);
         void getCommandEnumFromInput(const std::string& input, Command& cmd, unsigned int commandStopInd);
         void parseArguments(const std::string& input, Command& cmd, unsigned int commandStopInd);
