@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "../json.hpp"
-#include "../file.hpp"
-#include "../menu.hpp"
+#include "../json.cpp"
+#include "../file.cpp"
+#include "../menu.cpp"
 
 struct TestResult {
     std::string name;
@@ -82,14 +82,6 @@ std::string readTextFile(const std::string& path) {
     return data;
 }
 
-void runAll(TestRunner& runner) {
-    runner.runTest("Parse open command", []() { testParseOpenCommand(); });
-    runner.runTest("Parse quoted set command", []() { testParseQuotedSetCommand(); });
-    runner.runTest("Parse help command", []() { testParseHelpCommand(); });
-    runner.runTest("Execute open loads JSON", []() { testExecuteOpenLoadsJson(); });
-    runner.runTest("Execute save writes JSON", []() { testExecuteSaveWritesJson(); });
-    runner.runTest("Execute close closes file", []() { testExecuteCloseClosesFile(); });
-}
 
 // Ensures the open command parses command name and path
 void testParseOpenCommand() {
@@ -174,7 +166,14 @@ void testExecuteCloseClosesFile() {
     std::remove(filename.c_str());
 }
 
-
+void runAll(TestRunner& runner) {
+    runner.runTest("Parse open command", []() { testParseOpenCommand(); });
+    runner.runTest("Parse quoted set command", []() { testParseQuotedSetCommand(); });
+    runner.runTest("Parse help command", []() { testParseHelpCommand(); });
+    runner.runTest("Execute open loads JSON", []() { testExecuteOpenLoadsJson(); });
+    runner.runTest("Execute save writes JSON", []() { testExecuteSaveWritesJson(); });
+    runner.runTest("Execute close closes file", []() { testExecuteCloseClosesFile(); });
+}
 
 int main() {
     TestRunner runner;

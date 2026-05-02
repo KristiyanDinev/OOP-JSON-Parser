@@ -5,8 +5,28 @@
 #include "file.hpp"
 #include "json.hpp"
 
-enum CommandEnum;
-struct Command;
+enum CommandEnum {
+    OPEN,
+    CLOSE,
+    SAVE,
+    SAVEAS,
+    HELP,
+    EXIT,
+    VALIDATE,
+    PRINT,
+    SEARCH,
+    SET,
+    CREATE,
+    DELETE,
+    MOVE
+};
+
+struct Command
+{
+    std::string arg1;
+    std::string arg2;
+    CommandEnum commandEnum;
+};
 
 class Menu {
     public:

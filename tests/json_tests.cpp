@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../json.hpp"
+#include "../json.cpp"
 
 struct TestResult {
     std::string name;
@@ -61,17 +61,6 @@ private:
     std::vector<TestResult> results;
 };
 
-
-void runAll(TestRunner& runner) {
-    runner.runTest("Validate valid JSON", []() { testValidateValidJson(); });
-    runner.runTest("Validate invalid JSON", []() { testValidateInvalidJson(); });
-    runner.runTest("Search finds nested keys", []() { testSearchFindsNestedKeys(); });
-    runner.runTest("Create value on empty root", []() { testCreateValueOnEmptyRoot(); });
-    runner.runTest("Set path updates value", []() { testSetPathValueUpdates(); });
-    runner.runTest("Delete array element", []() { testDeleteArrayElement(); });
-    runner.runTest("Move value to new key", []() { testMoveValueMovesKey(); });
-    runner.runTest("Delete invalid path leaves data unchanged", []() { testDeleteInvalidPath(); });
-}
 
 // Validates that well-formed JSON parses successfully
 void testValidateValidJson() {
@@ -158,6 +147,17 @@ void testDeleteInvalidPath() {
     parser.deleteValue("missing");
     std::string after = parser.getData(0);
     require(before == after, "Expected JSON to remain unchanged for missing path.");
+}
+
+void runAll(TestRunner& runner) {
+    runner.runTest("Validate valid JSON", []() { testValidateValidJson(); });
+    runner.runTest("Validate invalid JSON", []() { testValidateInvalidJson(); });
+    runner.runTest("Search finds nested keys", []() { testSearchFindsNestedKeys(); });
+    runner.runTest("Create value on empty root", []() { testCreateValueOnEmptyRoot(); });
+    runner.runTest("Set path updates value", []() { testSetPathValueUpdates(); });
+    runner.runTest("Delete array element", []() { testDeleteArrayElement(); });
+    runner.runTest("Move value to new key", []() { testMoveValueMovesKey(); });
+    runner.runTest("Delete invalid path leaves data unchanged", []() { testDeleteInvalidPath(); });
 }
 
 // Runs the JsonParser test suite.

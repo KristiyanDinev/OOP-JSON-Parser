@@ -13,7 +13,7 @@ JsonNode::~JsonNode() = default;
 
 // Default function to print the indent for every class
 void JsonNode::printIndent(unsigned int indent) const {
-    for (int i = 0; i < indent; i++) std::cout << "  ";
+    for (int i = 0; i < indent; i++) std::cout << "    ";
 }
 
 // Get indent as string
@@ -130,15 +130,23 @@ void JsonParser::setJsonData(const std::string& jsonData) {
 // Validates JSON text with optional bool flag showMessages for feedback
 bool JsonParser::validate(bool showMessages) {
     delete root;
+    root = nullptr;
     std::stringstream ss(jsonData);
     try {
         root = parseValue(ss);
         skipWhitespace(ss);
+        if (ss.get() > 0) {
+            delete root;
+            root = nullptr;
+            printMessage(showMessages, "Invalid JSON.");
+            return false;
+        }
         printMessage(showMessages, "Valid JSON.");
         return true;
     } catch (const std::exception& e) {
-        printMessage(showMessages, e.what());
         delete root;
+        root = nullptr;
+        printMessage(showMessages, e.what());
         return false;
     }
 }
@@ -241,7 +249,6 @@ void JsonParser::createValue(const std::string& path, std::string& value) {
         }
         std::cout << "Invalid Path: Path '" << path << "' already exists.\n";
         return;
-
     } else if (arr) {
         arr->elements.push_back(new JsonPrimitive(value));
         std::cout << "Added " << value << " to " << path << std::endl;
@@ -311,8 +318,7 @@ void JsonParser::moveValue(const std::string& fromPath, const std::string& toPat
         std::cout << "Moved from " << fromPath << " to " << toPath << std::endl;
         return;
     }
-    
-    delete targetNode; 
+    fromObj->members[fromKey] = targetNode;
     std::cout << "Invalid Path: Destination path is invalid or already occupied.\n";
 }
 
@@ -408,6 +414,7 @@ JsonNode* JsonParser::parseArray(std::stringstream& ss) {
         char next = ss.get();
         if (next == ']') break;
         if (next != ',') throw std::exception();
+        skipWhitespace(ss);
     }
     return arr;
 }

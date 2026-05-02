@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../file.hpp"
+#include "../file.cpp"
 
 // The results from the test
 struct TestResult {
@@ -16,14 +16,14 @@ struct TestResult {
 
 
 // Fails the test when the condition is false
-static void require(bool condition, const std::string& message) {
+void require(bool condition, const std::string& message) {
     if (!condition) {
         throw std::runtime_error(message);
     }
 }
 
 // Fails the test when the expected substring is missing
-static void requireContains(const std::string& text, const std::string& expected, const std::string& message) {
+void requireContains(const std::string& text, const std::string& expected, const std::string& message) {
     if (text.find(expected) == std::string::npos) {
         throw std::runtime_error(message);
     }
@@ -33,7 +33,7 @@ static void requireContains(const std::string& text, const std::string& expected
 class TestRunner {
 public:
     // Executes a test and records it
-    void runTest(const std::string& name, const std::function<void(void)>& test) {
+    void runTest(const std::string& name, const std::function<void()>& test) {
         std::cout << "[RUN ] " << name << "\n";
         try {
             test();
@@ -85,16 +85,6 @@ std::string readTextFile(const std::string& path) {
     file.seekg(0, std::ios::beg);
     file.read(data.data(), size);
     return data;
-}
-
-
-// Run all tests
-void runAll(TestRunner& runner) {
-    runner.runTest("Open creates file", []() { testOpenCreatesFile(); });
-    runner.runTest("Save and read data", []() { testSaveAndReadData(); });
-    runner.runTest("SaveAs writes new file", []() { testSaveAsWritesNewFile(); });
-    runner.runTest("Close resets read", []() { testCloseResetsRead(); });
-    runner.runTest("Open invalid path falls back", []() { testOpenInvalidPathFallsBack(); });
 }
 
 // Verifies that openFile creates missing files
@@ -171,6 +161,15 @@ void testOpenInvalidPathFallsBack() {
     require(fileExists("file.json"), "Expected default file to exist after fallback.");
     manager.closeFile();
     std::remove("file.json");
+}
+
+// Run all tests
+void runAll(TestRunner& runner) {
+    runner.runTest("Open creates file", []() { testOpenCreatesFile(); });
+    runner.runTest("Save and read data", []() { testSaveAndReadData(); });
+    runner.runTest("SaveAs writes new file", []() { testSaveAsWritesNewFile(); });
+    runner.runTest("Close resets read", []() { testCloseResetsRead(); });
+    runner.runTest("Open invalid path falls back", []() { testOpenInvalidPathFallsBack(); });
 }
 
 int main() {

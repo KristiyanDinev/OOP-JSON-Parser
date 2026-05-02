@@ -8,29 +8,6 @@
 #include "json.hpp"
 #include "menu.hpp"
 
-enum CommandEnum {
-    OPEN,
-    CLOSE,
-    SAVE,
-    SAVEAS,
-    HELP,
-    EXIT,
-    VALIDATE,
-    PRINT,
-    SEARCH,
-    SET,
-    CREATE,
-    DELETE,
-    MOVE
-};
-
-struct Command
-{
-    std::string arg1;
-    std::string arg2;
-    CommandEnum commandEnum;
-};
-
 // Construct the Menu with the classes, which we need to execute the commands
 Menu::Menu(FileManager& fileManager, JsonParser& jsonParser) :
          fileManager(fileManager), jsonParser(jsonParser) {}
