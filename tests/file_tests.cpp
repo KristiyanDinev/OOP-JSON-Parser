@@ -109,7 +109,8 @@ void testSaveAndReadData() {
     manager.openFile(filename);
     std::string data = "{\"a\":1}";
     manager.saveData(data);
-    std::string read = manager.readData();
+    manager.readData();
+    std::string read = manager.getContext();
     requireContains(read, data, "Expected saved JSON content in file.");
     manager.closeFile();
     std::remove(fileNameData);
@@ -146,7 +147,8 @@ void testCloseResetsRead() {
     std::remove(fileNameData);
     manager.openFile(filename);
     manager.closeFile();
-    std::string read = manager.readData();
+    manager.readData();
+    std::string read = manager.getContext();
     require(read.empty(), "Expected empty read after close.");
     std::remove(fileNameData);
 }

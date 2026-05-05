@@ -9,11 +9,13 @@ class FileManager {
         void createFile(const std::string& name) const;
         void closeFile();
         void saveData(const std::string& data);
-        std::string readData();
+        void readData();
         void saveAs(std::string& newFilename, const std::string& data);
+        std::string getContext() const;
 
     private:
         std::fstream file;
+        std::string context;
         std::string defaultFileName = "file.json";
         std::string currentFileName;
 };

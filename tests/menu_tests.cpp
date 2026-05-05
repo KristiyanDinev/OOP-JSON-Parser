@@ -161,7 +161,8 @@ void testExecuteCloseClosesFile() {
     menu.executeCommand(openCmd);
     Command closeCmd{"", "", CommandEnum::CLOSE};
     menu.executeCommand(closeCmd);
-    std::string read = manager.readData();
+    manager.readData();
+    std::string read = manager.getContext();
     require(read.empty(), "Expected empty read after close.");
     std::remove(filename.c_str());
 }

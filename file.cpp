@@ -18,12 +18,15 @@ bool FileManager::openFile(std::string& filename) {
         std::cout << "Can't open/create the file: " << filename << std::endl;
         if (!file.is_open()) {
             file.clear();
+            
             std::cout << "Can't open/create the file: " << defaultFileName << std::endl;
             return false;
         }
         filename = defaultFileName;
     }
     currentFileName = filename;
+    readData();
+    file.close();
     std::cout << "The file is open/create: " << filename << std::endl;
     return true;
 }
@@ -31,6 +34,7 @@ bool FileManager::openFile(std::string& filename) {
 // Create that file by opening it with the append IO flag
 void FileManager::createFile(const std::string& name) const {
     std::fstream created(name, std::ios::app);
+    created.close();
 }
 
 // Closes the current file and clear the file flags
@@ -38,8 +42,9 @@ void FileManager::closeFile() {
     if (file.is_open()) {
         file.close();
         std::cout << "The file is closed." << std::endl;
+    } else {
+        file.clear();
     }
-    file.clear();
 }
 
 // Close and open the file as a new file (no context from original file) and save the given
@@ -47,34 +52,34 @@ void FileManager::closeFile() {
 void FileManager::saveData(const std::string& data) {
     if (file.is_open()) {
         file.close();
-        file.clear();
-        file.open(currentFileName, std::ios::in | std::ios::out | std::ios::trunc);
-        if (!file.is_open()) {
-            std::cout << "The file is not open. Data cannot be written." << std::endl;
-            return;
-        }
-        file << data << std::endl;
-        file.flush();
-        std::cout << "The data has been written to the file." << std::endl;
-    } else {
-        std::cout << "The file is not open. Data cannot be written." << std::endl;
     }
+    file.open(currentFileName, std::ios::in | std::ios::out | std::ios::trunc);
+    if (!file.is_open()) {
+        std::cout << "The file is not open. Data cannot be written." << std::endl;
+        return;
+    }
+    file << data << std::endl;
+    file.flush();
+    std::cout << "The data has been written to the file." << std::endl;
 }
 
 // Get the entire file content
-std::string FileManager::readData() {
+void FileManager::readData() {
     if (!file.is_open()) {
-        return "";
+        context = "";
+        return;
     }
     file.clear();
     file.seekg(0, std::ios::end);
     std::size_t size = file.tellg();
-    std::string data;
-    data.resize(size);
+    context.resize(size);
 
     file.seekg(0, std::ios::beg);
-    file.read(data.data(), size);
-    return data;
+    file.read(context.data(), size);
+}
+
+std::string FileManager::getContext() const {
+    return context;
 }
 
 // Saves data to a new file and keep the new file open
