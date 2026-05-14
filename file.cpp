@@ -59,7 +59,6 @@ void FileManager::saveData(const std::string& data) {
         return;
     }
     file << data << std::endl;
-    file.flush();
     std::cout << "The data has been written to the file." << std::endl;
 }
 
