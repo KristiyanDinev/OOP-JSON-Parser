@@ -6,6 +6,7 @@
 #include <string>
 
 #include "json.hpp"
+#include "print.hpp"
 
 // Virtual destructor for JsonNode
 JsonNode::~JsonNode() = default;
@@ -13,7 +14,7 @@ JsonNode::~JsonNode() = default;
 
 // Default function to print the indent for every class
 void JsonNode::printIndent(unsigned int indent) const {
-    for (int i = 0; i < indent; i++) std::cout << "    ";
+    for (int i = 0; i < indent; i++) printData("    ");
 }
 
 // Get indent as string
@@ -30,7 +31,7 @@ JsonPrimitive::JsonPrimitive(const std::string& val) : value(val) {}
 
 // Print that value
 void JsonPrimitive::print(unsigned int indent) const {
-    std::cout << value;
+    printData(value);
 }
 
 // Get that value
@@ -48,18 +49,18 @@ JsonObject::~JsonObject() {
 // Pretty print JsonObject
 void JsonObject::print(unsigned int indent) const {
     unsigned int nextIndent = indent + 1;
-    std::cout << "{\n";
+    printData("{\n");
     bool first = true;
     for (auto const& pair : members) {
-        if (!first) std::cout << ",\n";
+        if (!first) printData(",\n");
         printIndent(nextIndent);
-        std::cout << "\"" << pair.first << "\": ";
+        printData('\"' + pair.first + "\": ");
         pair.second->print(nextIndent);
         first = false;
     }
-    std::cout << "\n";
+    printData("\n");
     printIndent(indent);
-    std::cout << "}";
+    printData("}");
 }
 
 // Get pretty print as string
@@ -88,17 +89,17 @@ JsonArray::~JsonArray() {
 // Pretty print JsonArray
 void JsonArray::print(unsigned int indent) const {
     unsigned int nextIndent = indent + 1;
-    std::cout << "[\n";
+    printData("[\n");
     bool first = true;
     for (JsonNode* node : elements) {
-        if (!first) std::cout << ",\n";
+        if (!first) printData(",\n");
         printIndent(nextIndent);
         node->print(nextIndent);
         first = false;
     }
-    std::cout << "\n";
+    printData('\n');
     printIndent(indent);
-    std::cout << "]";
+    printData(']');
 }
 
 // Get pretty print as string
@@ -155,9 +156,9 @@ bool JsonParser::validate(bool showMessages) {
 void JsonParser::print() {
     if (root) {
         root->print();
-        std::cout << "\n";
+        printData("\n");
     } else {
-        std::cout << "No valid JSON data loaded.\n";
+        printData("No valid JSON data loaded.\n");
     }
 }
 
@@ -166,15 +167,15 @@ void JsonParser::search(const std::string& key) {
     std::vector<JsonNode*> results;
     searchRecursive(root, key, results);
     
-    std::cout << "Search results for key '" << key << "': [\n";
+    printData("Search results for key '" + key + "': [\n");
     bool first = true;
     for (std::size_t i = 0; i < results.size(); ++i) {
         results[i]->print(1);
-        if (!first) std::cout << ",";
-        std::cout << "\n";
+        if (!first) printData(",");
+        printData("\n");
         first = false;
     }
-    std::cout << "]\n";
+    printData("]\n");
 }
 
 // Replaces an already existing value on that path with our new value
@@ -192,7 +193,7 @@ void JsonParser::setPathValue(const std::string& path, std::string& value) {
     if (obj && obj->members.find(finalKey) != obj->members.end()) {
         delete obj->members[finalKey];
         obj->members[finalKey] = new JsonPrimitive(value);
-        std::cout << "Set " << path << " with the value " << value << std::endl;
+        printData("Set " + path + " with the value " + value + '\n');
         return;
         
     } else if (arr) {
@@ -200,11 +201,11 @@ void JsonParser::setPathValue(const std::string& path, std::string& value) {
         if (index < arr->elements.size()) {
             delete arr->elements[index];
             arr->elements[index] = new JsonPrimitive(value);
-            std::cout << "Set " << path << " with the value " << value << std::endl;
+            printData("Set " + path + " with the value " + value + '\n');
             return;
         }
     }
-    std::cout << "Invalid Path: '" << path << "' does not exist.\n";
+    printData("Invalid Path: '" + path + "' does not exist.\n");
 }
 
 // Creates a new value with the given path
@@ -222,7 +223,7 @@ void JsonParser::createValue(const std::string& path, std::string& value) {
         const std::string& key = parts[i];
         JsonObject* obj = dynamic_cast<JsonObject*>(current);
         if (!obj) {
-            std::cout << "Invalid Path: Path '" << path << "' does not exist.\n";
+            printData("Invalid Path: Path '" + path + "' does not exist.\n");
             return;
         }
 
@@ -244,18 +245,18 @@ void JsonParser::createValue(const std::string& path, std::string& value) {
     if (obj) {
         if (obj->members.find(finalKey) == obj->members.end()) {
             obj->members[finalKey] = new JsonPrimitive(value);
-            std::cout << "Created " << path << " with value " << value << std::endl;
+            printData("Created " + path + " with value " + value + '\n');
             return;
         }
-        std::cout << "Invalid Path: Path '" << path << "' already exists.\n";
+        printData("Invalid Path: Path '" + path + "' already exists.\n");
         return;
     } else if (arr) {
         arr->elements.push_back(new JsonPrimitive(value));
-        std::cout << "Added " << value << " to " << path << std::endl;
+        printData("Added " + value + " to " + path + '\n');
         return;
     }
 
-    std::cout << "Invalid Path: Path '" << path << "' does not exist.\n";
+    printData("Invalid Path: Path '" + path + "' does not exist.\n");
 }
 
 // Deletes the value at the given path
@@ -274,7 +275,7 @@ void JsonParser::deleteValue(const std::string& path) {
         if (itEle != obj->members.end()) {
             delete itEle->second;
             obj->members.erase(itEle);
-            std::cout << "Deleted " << path << std::endl;
+            printData("Deleted " + path + '\n');
             return;
         }
     } else if (arr) {
@@ -282,11 +283,11 @@ void JsonParser::deleteValue(const std::string& path) {
         if (index < arr->elements.size()) {
             delete arr->elements[index];
             arr->elements.erase(arr->elements.begin() + index);
-            std::cout << "Deleted " << path << std::endl;
+            printData("Deleted " + path + '\n');
             return;
         }
     }
-    std::cout << "Error: Path '" << path << "' does not exist.\n";
+    printData("Error: Path '" + path + "' does not exist.\n");
 }
 
 // Moves a value from one path to another
@@ -304,7 +305,7 @@ void JsonParser::moveValue(const std::string& fromPath, const std::string& toPat
     }
 
     if (!targetNode) {
-        std::cout << "Invalid Path: From path '" << fromPath << "' does not exist.\n";
+        printData("Invalid Path: From path '" + fromPath + "' does not exist.\n");
         return;
     }
 
@@ -315,11 +316,11 @@ void JsonParser::moveValue(const std::string& fromPath, const std::string& toPat
     JsonObject* toObj = dynamic_cast<JsonObject*>(toParent);
     if (toObj && toObj->members.find(toKey) == toObj->members.end()) {
         toObj->members[toKey] = targetNode;
-        std::cout << "Moved from " << fromPath << " to " << toPath << std::endl;
+        printData("Moved from " + fromPath + " to " + toPath + '\n');
         return;
     }
     fromObj->members[fromKey] = targetNode;
-    std::cout << "Invalid Path: Destination path is invalid or already occupied.\n";
+    printData("Invalid Path: Destination path is invalid or already occupied.\n");
 }
 
 // Get the root pretty print as string 
@@ -349,7 +350,7 @@ void JsonParser::formatValue(std::string& value) const {
 // Print a message only when showMessages is true
 void JsonParser::printMessage(bool showMessages, const char* message) {
     if (showMessages) {
-        std::cout << message << std::endl;
+        printData(message + '\n');
     }
 }
 

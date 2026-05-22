@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "../file.cpp"
+#include "../print.hpp"
 
 // The results from the test
 struct TestResult {
@@ -34,14 +35,14 @@ class TestRunner {
 public:
     // Executes a test and records it
     void runTest(const std::string& name, const std::function<void()>& test) {
-        std::cout << "[RUN ] " << name << "\n";
+        printData("[RUN ] " + name + '\n');
         try {
             test();
             results.push_back({name, "", true});
-            std::cout << "[PASS] " << name << "\n";
+            printData("[PASS] " + name + '\n');
         } catch (const std::exception& ex) {
             results.push_back({name, ex.what(), false});
-            std::cout << "[FAIL] " << name << " - " << ex.what() << "\n";
+            printData("[FAIL] " + name + " - " + ex.what() + '\n');
         }
     }
 
@@ -53,8 +54,13 @@ public:
                 failed++;
             }
         }
-        std::cout << "\nSummary: " << (results.size() - failed) << " passed, "
-                  << failed << " failed, " << results.size() << " total.\n";
+        printData("\nSummary: ");
+        printData(results.size() - failed);
+        printData(" passed, ");
+        printData(failed);
+        printData(" failed, ");
+        printData(results.size());
+        printData(" total.\n");
         return failed;
     }
 

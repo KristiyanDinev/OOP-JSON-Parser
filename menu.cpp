@@ -7,6 +7,7 @@
 #include "file.hpp"
 #include "json.hpp"
 #include "menu.hpp"
+#include "print.hpp"
 
 // Construct the Menu with the classes, which we need to execute the commands
 Menu::Menu(FileManager& fileManager, JsonParser& jsonParser) :
@@ -14,21 +15,22 @@ Menu::Menu(FileManager& fileManager, JsonParser& jsonParser) :
 
 // the Help menu
 void Menu::printHelp() {
-    std::cout << "\n--------\n File Commands"
-    << "\n\nopen [/path/to/file] - Opens the file selected by the user in the application for processing. If the file does not exist, the program creates a new JSON file named file.json at that location for processing, and it will report an error if it cannot create it."
-    << "\n\nclose - Closes the opened file in the application without saving it."
-    << "\n\nsave - Saves the opened file to disk and keeps it open."
-    << "\n\nsaveas - Saves the opened file as a new file."
-    << "\n\nhelp - Shows the help menu with all commands and their information."
-    << "\n\nexit - Exits the program. If a file is open, it will not be saved and all modified information will be lost, if any exists."
-    << "\n\n JSON Commands"
-    << "\n\nvalidate - Provides feedback to the user about whether the JSON file is written in a valid format or contains a syntax error."
-    << "\n\nprint - Prints all information from the JSON file in a more readable format."
-    << "\n\nsearch <key> - Outputs an array of all values that have the provided key."
-    << "\n\nset <path> <string> - Updates the given path with a new value. If the path does not exist, an error will occur."
-    << "\n\ncreate <path> <string> - Creates a new path with a new value. If the path already exists, an error will occur."
-    << "\n\ndelete <path> - Deletes a path and its corresponding value."
-    << "\n\nmove <from path> <to path> - Elements at the from path will be moved and assigned the new to path.\n--------\n";
+    printData(
+        "\n--------\n File Commands"
+        "\n\nopen [/path/to/file] - Opens the file selected by the user in the application for processing. If the file does not exist, the program creates a new JSON file named file.json at that location for processing, and it will report an error if it cannot create it."
+        "\n\nclose - Closes the opened file in the application without saving it."
+        "\n\nsave - Saves the opened file to disk and keeps it open."
+        "\n\nsaveas - Saves the opened file as a new file."
+        "\n\nhelp - Shows the help menu with all commands and their information."
+        "\n\nexit - Exits the program. If a file is open, it will not be saved and all modified information will be lost, if any exists."
+        "\n\n JSON Commands"
+        "\n\nvalidate - Provides feedback to the user about whether the JSON file is written in a valid format or contains a syntax error."
+        "\n\nprint - Prints all information from the JSON file in a more readable format."
+        "\n\nsearch <key> - Outputs an array of all values that have the provided key."
+        "\n\nset <path> <string> - Updates the given path with a new value. If the path does not exist, an error will occur."
+        "\n\ncreate <path> <string> - Creates a new path with a new value. If the path already exists, an error will occur."
+        "\n\ndelete <path> - Deletes a path and its corresponding value."
+        "\n\nmove <from path> <to path> - Elements at the from path will be moved and assigned the new to path.\n--------\n");
 }
 
 // Get console input (Usefull when seperated, so we can use getCommand() independently)

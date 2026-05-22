@@ -8,6 +8,7 @@
 #include "../json.cpp"
 #include "../file.cpp"
 #include "../menu.cpp"
+#include "../print.hpp"
 
 struct TestResult {
     std::string name;
@@ -32,14 +33,14 @@ void requireContains(const std::string& text,
 class TestRunner {
 public:
     void runTest(const std::string& name, const std::function<void()>& test) {
-        std::cout << "[RUN ] " << name << "\n";
+        printData("[RUN ] " + name + '\n');
         try {
             test();
             results.push_back({name, "", true});
-            std::cout << "[PASS] " << name << "\n";
+            printData("[PASS] " + name + '\n');
         } catch (const std::exception& ex) {
             results.push_back({name, ex.what(), false});
-            std::cout << "[FAIL] " << name << " - " << ex.what() << "\n";
+            printData("[FAIL] " + name + " - " + ex.what() + '\n');
         }
     }
 
@@ -50,8 +51,13 @@ public:
                 failed++;
             }
         }
-        std::cout << "\nSummary: " << (results.size() - failed) << " passed, "
-                  << failed << " failed, " << results.size() << " total.\n";
+        printData("\nSummary: ");
+        printData(results.size() - failed);
+        printData(" passed, ");
+        printData(failed);
+        printData(" failed, ");
+        printData(results.size());
+        printData(" total.\n");
         return failed;
     }
 

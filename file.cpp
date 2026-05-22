@@ -5,6 +5,7 @@
 #include <string>
 
 #include "file.hpp"
+#include "print.hpp"
 
 // Creates (if does not exists) and opens a file stream, which will be used while editing the JSON
 bool FileManager::openFile(std::string& filename) {
@@ -15,11 +16,11 @@ bool FileManager::openFile(std::string& filename) {
         file.clear();
         createFile(defaultFileName);
         file.open(defaultFileName, std::ios::in | std::ios::out);
-        std::cout << "Can't open/create the file: " << filename << std::endl;
+        printData("Can't open/create the file: " + filename + '\n');
         if (!file.is_open()) {
             file.clear();
             
-            std::cout << "Can't open/create the file: " << defaultFileName << std::endl;
+            printData("Can't open/create the file: " + defaultFileName + '\n');
             return false;
         }
         filename = defaultFileName;
@@ -27,7 +28,7 @@ bool FileManager::openFile(std::string& filename) {
     currentFileName = filename;
     readData();
     file.close();
-    std::cout << "The file is open/create: " << filename << std::endl;
+    printData("The file is open/create: " + filename + '\n');
     return true;
 }
 
@@ -41,7 +42,7 @@ void FileManager::createFile(const std::string& name) const {
 void FileManager::closeFile() {
     if (file.is_open()) {
         file.close();
-        std::cout << "The file is closed." << std::endl;
+        printData("The file is closed.\n");
     } else {
         file.clear();
     }
@@ -55,11 +56,11 @@ void FileManager::saveData(const std::string& data) {
     }
     file.open(currentFileName, std::ios::in | std::ios::out | std::ios::trunc);
     if (!file.is_open()) {
-        std::cout << "The file is not open. Data cannot be written." << std::endl;
+        printData("The file is not open. Data cannot be written.\n");
         return;
     }
     file << data << std::endl;
-    std::cout << "The data has been written to the file." << std::endl;
+    printData("The data has been written to the file.\n");
 }
 
 // Get the entire file content
