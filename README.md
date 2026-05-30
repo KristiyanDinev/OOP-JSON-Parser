@@ -6,7 +6,7 @@ Console application for reading, validating, modifying, and saving JSON files wi
 
 ## Purpose
 
-Provide a compact command-driven workflow for inspecting and editing JSON documents.
+Json Parser as microservice .
 
 ## Build and Run
 
@@ -26,7 +26,7 @@ If you prefer to build the test programs, compile each file in `tests/` separate
 
 ## C++ Version
 
-The code is compatible with C++11 and later. C++17 is recommended for building and testing the project.
+The code is compatible C++17 and forward.
 
 ## Terms
 
@@ -50,7 +50,7 @@ Note: `set` and `create` accept primitive values only.
 - `print` - Prints the JSON with indentation.
 - `search <key>` - Prints an array with all values that match the key.
 - `set <path> <string>` - Updates an existing path with a new value.
-- `create <path> <string>` - Creates a new path with a value.
+- `create <path> <string>` - Creates a new path with a value. It only creates **Json Objects** `{}`
 - `delete <path>` - Deletes a path and its value.
 - `move <from path> <to path>` - Moves a value from one path to another.
 

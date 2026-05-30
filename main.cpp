@@ -11,6 +11,7 @@ int main() {
     FileManager fileManager;
     JsonParser jsonParser;
     Menu menu = Menu(fileManager, jsonParser);
+    std::cout << "Json Parser CLI waiting for your command\n";
     while (true) {
         menu.executeCommand(menu.getCommand(menu.getInput()));
     }

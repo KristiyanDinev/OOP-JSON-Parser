@@ -178,6 +178,18 @@ void JsonParser::search(const std::string& key) {
     printData("]\n");
 }
 
+int JsonParser::handleJsonArrayIndex(std::vector<std::string> parts) {
+    int index;
+    try {
+        index = std::stoi(parts.back());
+    } catch (const std::exception& e) {
+        printData("Invalid path");
+        return -1;
+    }
+
+    return index;
+}
+
 // Replaces an already existing value on that path with our new value
 void JsonParser::setPathValue(const std::string& path, std::string& value) {
     std::vector<std::string> parts = splitPath(path);
@@ -197,7 +209,7 @@ void JsonParser::setPathValue(const std::string& path, std::string& value) {
         return;
         
     } else if (arr) {
-        std::size_t index = std::stoi(finalKey);
+        int index = handleJsonArrayIndex(parts);
         if (index < arr->elements.size()) {
             delete arr->elements[index];
             arr->elements[index] = new JsonPrimitive(value);
@@ -222,18 +234,27 @@ void JsonParser::createValue(const std::string& path, std::string& value) {
     for (std::size_t i = 0; i < parts.size() - 1; ++i) {
         const std::string& key = parts[i];
         JsonObject* obj = dynamic_cast<JsonObject*>(current);
-        if (!obj) {
-            printData("Invalid Path: Path '" + path + "' does not exist.\n");
-            return;
-        }
+        JsonArray* arr = dynamic_cast<JsonArray*>(current);
+        if (obj) {
+            auto it = obj->members.find(key);
+            if (it == obj->members.end()) {
+                JsonObject* next = new JsonObject();
+                obj->members[key] = next;
+                current = next;
+            } else {
+                current = it->second;
+            }
+        } else if (arr) {
+            try {
+                // move forward in the array
+                current = arr->elements.at(std::stoi(key));
 
-        auto it = obj->members.find(key);
-        if (it == obj->members.end()) {
-            JsonObject* next = new JsonObject();
-            obj->members[key] = next;
-            current = next;
-        } else {
-            current = it->second;
+            } catch (const std::exception& e) {
+                JsonObject* next = new JsonObject();
+                arr->elements.push_back(next);
+                current = arr->elements.back();
+                return;
+            }
         }
     }
 
@@ -279,7 +300,7 @@ void JsonParser::deleteValue(const std::string& path) {
             return;
         }
     } else if (arr) {
-        std::size_t index = std::stoi(finalKey);
+        int index = handleJsonArrayIndex(parts);
         if (index < arr->elements.size()) {
             delete arr->elements[index];
             arr->elements.erase(arr->elements.begin() + index);
@@ -350,7 +371,7 @@ void JsonParser::formatValue(std::string& value) const {
 // Print a message only when showMessages is true
 void JsonParser::printMessage(bool showMessages, const char* message) {
     if (showMessages) {
-        printData(message + '\n');
+        printData(std::string(message) + '\n');
     }
 }
 

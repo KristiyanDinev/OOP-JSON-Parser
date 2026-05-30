@@ -91,4 +91,5 @@ void FileManager::saveAs(std::string& newFilename, const std::string& data) {
         return;
     }
     saveData(data);
+    closeFile();
 }

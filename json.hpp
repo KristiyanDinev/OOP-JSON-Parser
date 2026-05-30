@@ -74,6 +74,7 @@ private:
     JsonNode* formatString(std::stringstream& ss);
     JsonNode* parseOther(std::stringstream& ss);
     std::vector<std::string> splitPath(const std::string& path);
+    int handleJsonArrayIndex(std::vector<std::string> parts);
     JsonNode* findParentNode(JsonNode* current, const std::vector<std::string>& path, std::size_t index);
     void searchRecursive(JsonNode* current, const std::string& searchKey, std::vector<JsonNode*>& results);
 };

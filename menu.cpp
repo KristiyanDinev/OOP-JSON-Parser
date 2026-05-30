@@ -69,8 +69,9 @@ Command Menu::getCommand(const std::string& input) {
 void Menu::executeCommand(Command cmd) {
     switch (cmd.commandEnum) {
         case CommandEnum::OPEN:
-            fileManager.openFile(cmd.arg1);
-            jsonParser.setJsonData(fileManager.getContext());
+            if (fileManager.openFile(cmd.arg1)) {
+                jsonParser.setJsonData(fileManager.getContext());
+            }
             break;
         case CommandEnum::CLOSE:
             fileManager.closeFile();
